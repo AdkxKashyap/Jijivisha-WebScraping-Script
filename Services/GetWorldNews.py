@@ -120,7 +120,7 @@ class GetGlobalNews():
                 news_data=self.final_news_list
             )
             data.save()
-            return "Data Saved Successfully"
+            return "World News Data Saved Successfully"
          except Exception as errMsg:
              return errMsg
         

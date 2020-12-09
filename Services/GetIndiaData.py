@@ -1,47 +1,162 @@
 from bs4 import BeautifulSoup
 from selenium import webdriver
 from Model.india_covid_datamodel import IndiaCovidData
+import requests
+import logging
+import json
 
 class GetIndiaData():
     def __init__(self):
+        logging.basicConfig(filename="./logs/GetIndiaData.log",filemode='w',format='%(asctime)s - %(levelname)s - %(message)s', datefmt='%d-%b-%y %H:%M:%S',level=logging.INFO)
         try:
-            self.driver=webdriver.Chrome('Assets/chromedriver')
-            self.driver.get("https://covid19ind.zaoapp.net/")
-            self.soup=BeautifulSoup(self.driver.page_source,'html.parser')
+            url='https://api.covid19india.org/v4/data.json'
+            page=requests.get(url)
+            self.all_india_data=page.json()
+            logging.info("++++++++ ALL INDIA DATA +++++++++++++%s",self.all_india_data)
         except Exception as err:
+            logging.exception(err)
             raise Exception(err)
-    def getAllData(self):
+
+    # def get_soup(self,page):    
+    #     return BeautifulSoup(page.content,'html.parser')
+
+    def getAllStatesData(self):
 
         try:
-            html_soup=self.soup
-            main_table=html_soup.find_all("table")[0]
-            main_table_body=main_table.find('tbody')
-            table_rows=main_table_body.find_all('tr')
-            if not(main_table or main_table_body or table_rows):
-                raise Exception("Table Element Not Found.")
+            data=self.all_india_data
             data_list=[]
-            for row in table_rows:
-                
-                table_data=row.find_all('td')
-                if not table_data:
+            for key in data:
+                if(key=='TT'):
                     continue
-                data_dist={
-                    "state":table_data[0].text.title().strip(),
-                    "confirmed":table_data[1].text.strip(),
-                    "recovered":table_data[2].text.strip(),
-                    "deaths":table_data[3].text.strip()       
-                    }
-               
-                data_list.append(data_dist)
+                total_data=data[key]['total']
+                state=self.getState(key)
+                data_dict={
+                    "state":state,
+                    "confirmed":total_data['confirmed'],
+                    "recovered":total_data['recovered'],
+                    "deaths":total_data['deceased'],
+                    "tested":total_data['tested']
+                }
+                data_list.append(data_dict)
+
+            logging.info("%s+++++++++ STATES DATA LIST ++++++++++++++++++%s",self.getAllStatesData.__name__,data_list)
+
             
             data=IndiaCovidData(
                 covid_data=data_list
             )
             data.save()
-            return "Data Saved Successfully"
+            return "GetAllStatesData Saved Successfully"
         except Exception as err:
+            logging.exception(err)
             raise Exception(err)
-        finally:
-            self.driver.close()
+       
+    def getState(self,state_code):
+        #returns state name using state code
+        if(state_code=='AN'):
+            return 'Andaman and Nicobar Islands'
+
+        if(state_code=='AP'):
+            return 'Andhra Pradesh'
+        
+        if(state_code=='AR'):
+            return 'Arunachal Pradesh'
+        
+        if(state_code=='AS'):
+            return 'Assam'
+        
+        if(state_code=='BR'):
+            return 'Bihar'
+
+        if(state_code=='CH'):
+            return 'Chandigarh'
+        
+        if(state_code=='CT'):
+            return 'Chattisgarh'
+
+        if(state_code=='DL'):
+            return 'Delhi'
+
+        if(state_code=='DN'):
+            return 'Dadra and Nagar Haveli'
+
+        if(state_code=='GA'):
+            return 'Goa'
+
+        if(state_code=='GJ'):
+            return 'Gujarat'
+
+        if(state_code=='HR'):
+            return 'Haryana'
+
+        if(state_code=='HP'):
+            return 'Himachal Pradesh'
+
+        if(state_code=='JH'):
+            return 'Jharkhand'
+
+        if(state_code=='JK'):
+            return 'Jammu and Kashmir'
+
+        if(state_code=='KA'):
+            return 'Karnataka'
+
+        if(state_code=='KL'):
+            return 'Kerala'
+
+        if(state_code=='LA'):
+            return 'Ladakh'
+
+        if(state_code=='MH'):
+            return 'Maharashtra'
+
+        if(state_code=='ML'):
+            return 'Meghalaya'
+
+        if(state_code=='MN'):
+            return 'Manipur'
+
+        if(state_code=='MP'):
+            return 'Madhya Pradesh'
+
+        if(state_code=='MZ'):
+            return 'Mizoram'
+
+        if(state_code=='NL'):
+            return 'Nagaland'
+
+        if(state_code=='OR'):
+            return 'Odisha'
+
+        if(state_code=='PB'):
+            return 'Punjab'
+
+        if(state_code=='PY'):
+            return 'Pondicherry'
+
+        if(state_code=='RJ'):
+            return 'Rajasthan'
+
+        if(state_code=='SK'):
+            return 'Sikkim'
+
+        if(state_code=='TG'):
+            return 'Telangana'
+
+        if(state_code=='TR'):
+            return 'Tripura'
+
+        if(state_code=='TN'):
+            return 'Tamil Nadu'
+
+        if(state_code=='UP'):
+            return 'Uttar Pradesh'
+
+        if(state_code=='UT'):
+            return 'Uttarakhand'
+
+        if(state_code=='WB'):
+            return 'West Bengal'
+
+             
             
-    

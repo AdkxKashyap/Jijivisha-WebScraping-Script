@@ -9,10 +9,10 @@ from db import mongo
 def main():
     try:
         get_covid_data=GetCOVIDdata.RetriveCOVIdDATA().get_data_allcountries()
-        get_agg_data=RetriveCOVIdDATA().get_data_aggregate()
-        get_india_data=GetIndiaData().getAllData()
         print(get_covid_data)
+        get_agg_data=RetriveCOVIdDATA().get_data_aggregate()
         print(get_agg_data)
+        get_india_data=GetIndiaData().getAllStatesData()
         print(get_india_data)
 
         print(GetIndiaNews().get_all_news())

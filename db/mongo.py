@@ -9,6 +9,7 @@ try:
     mongo_url=env("MONGO_URL")
     
     connect("Jijivisha",host=mongo_url)
+    
 except Exception as err:
     print(err)
 

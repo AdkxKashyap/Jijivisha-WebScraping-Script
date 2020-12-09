@@ -3,6 +3,7 @@ from selenium import webdriver
 from Model.india_latest_news_datamodel import IndiaNews
 import requests
 import re
+import logging
 
 class GetIndiaNews():
     def __init__(self):
@@ -16,6 +17,7 @@ class GetIndiaNews():
          #For easy debugging
         if not elem:
             errMsg="In "+func_name+","+elem_name+" Not Found."
+            logging.info("%s+++++++++++++++++++++++++++++++%s",self.check_elem,errMsg)
             raise Exception(errMsg)
     
     def data_from_worlometers(self):
@@ -34,9 +36,11 @@ class GetIndiaNews():
                 "heading":"Covid Cases in India.",
                 "content":finale_data
             }
+            # logging.info("%s+++++++++++++++++++++++++++++++%s",self.data_from_worlometers,news_dict)
             self.final_news_list.append(news_dict)
         except Exception as errMsg:
-            print(errMsg)
+            logging.exception("%s+++++++++++++++++++++++++++++++%s",self.data_from_worlometers,errMsg)
+            raise Exception(errMsg)
     
     def data_from_firstpost(self):
         try:
@@ -58,12 +62,15 @@ class GetIndiaNews():
                         "content":div.find(class_="list-desc").text
                     }
                     self.final_news_list.append(news_dict)
+            # logging.info("%s+++++++++++++++++++++++++++++++%s",self.data_from_firstpost,news_dict)
             return self.final_news_list
         except Exception as errMsg:
-            return errMsg
+            logging.exception("%s+++++++++++++++++++++++++++++++%s",self.data_from_firstpost,errMsg)
+            raise Exception(errMsg)
     
     def data_from_bbc(self):
         try:
+            logging.basicConfig(filename="./logs/GetIndiaNews.log",filemode='w',format='%(asctime)s - %(levelname)s - %(message)s', datefmt='%d-%b-%y %H:%M:%S',level=logging.INFO)
             page=requests.get('https://www.bbc.com/news/world/asia/india')
             
             news_dict={}
@@ -108,19 +115,22 @@ class GetIndiaNews():
                     self.final_news_list.append(news_dict)
             return self.final_news_list
         except Exception as errMsg:
-            return errMsg
+            logging.exception("%s+++++++++++++++++++++++++++++++%s",self.data_from_bbc,errMsg)
+            raise Exception(errMsg)
         
      
     def get_all_news(self):
          try:
             self.data_from_worlometers()
             self.data_from_bbc()
-            self.data_from_firstpost()
+            # not working
+            # self.data_from_firstpost()
             
             data=IndiaNews(
                 news_data=self.final_news_list
             )
+            logging.exception("%s+++++++++++++++++++++++++++++++%s",self.get_all_news,self)
             data.save()
-            return "Data Saved Successfully" 
+            return "All India News Data Saved Successfully" 
          except Exception as errMsg:
              return errMsg
