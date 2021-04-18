@@ -16,7 +16,8 @@ def main():
         print(get_india_data)
 
         print(GetIndiaNews().get_all_news())
-        print( GetGlobalNews().get_all_news())
+        print(GetGlobalNews().get_all_news())
+        print(GetIndiaData().get_district_data())
         # print(GetMythBusters().save_data())
     except Exception as identifier:
         print(identifier)

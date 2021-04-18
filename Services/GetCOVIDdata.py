@@ -11,7 +11,7 @@ class RetriveCOVIdDATA:
     def __init__(self):
         try:
           
-            logging.basicConfig(filename="./logs/GetCovidData.log",filemode='a',format='%(asctime)s - %(levelname)s - %(message)s', datefmt='%d-%b-%y %H:%M:%S',level=logging.INFO)
+            logging.basicConfig(filename="./logs/GetCovidData.log",filemode='w',format='%(asctime)s - %(levelname)s - %(message)s', datefmt='%d-%b-%y %H:%M:%S',level=logging.INFO)
             page=requests.get("https://www.worldometers.info/coronavirus/#countries")
             self.soup=self.get_soup(page)
             # print(self.soup)
@@ -120,14 +120,15 @@ class RetriveCOVIdDATA:
                     "total_deaths":html_td[4].text.strip(),
                     "new_deaths":html_td[5].text.strip(),
                     "total_recovered":html_td[6].text.strip(),
-                    "active_cases":html_td[7].text.strip(),
-                    "serious_or_critical":html_td[8].text.strip(),
-                    "tot_cases_oneM_pop":html_td[9].text.strip(),
-                    "deaths_oneM_pop":html_td[10].text.strip(),
-                    "total_tests":html_td[11].text.strip(),
-                    "tests_oneM_pop":html_td[12].text.strip(),
-                    "continent":html_td[13].text.lower().strip()
+                    "active_cases":html_td[8].text.strip(),
+                    "serious_or_critical":html_td[9].text.strip(),
+                    "tot_cases_oneM_pop":html_td[10].text.strip(),
+                    "deaths_oneM_pop":html_td[11].text.strip(),
+                    "total_tests":html_td[12].text.strip(),
+                    "tests_oneM_pop":html_td[13].text.strip(),
+                    "continent":html_td[15].text.lower().strip()
                 }
+                # print( html_td[8].text.strip(),country)
                 data_list.append(data_dist)
             logging.info("%s+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++%s",self.get_data_allcountries.__name__,data_list)
             data=MODEL.GlobalData(

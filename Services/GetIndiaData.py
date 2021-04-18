@@ -1,6 +1,7 @@
 from bs4 import BeautifulSoup
 from selenium import webdriver
 from Model.india_covid_datamodel import IndiaCovidData
+from Model.india_district_covid_datamodel import IndianDistrictData
 import requests
 import logging
 import json
@@ -28,14 +29,19 @@ class GetIndiaData():
             for key in data:
                 if(key=='TT'):
                     continue
+                
                 total_data=data[key]['total']
+                tested=total_data['tested'] if total_data['tested'] else 'NA'
+                confirmed=total_data['confirmed'] if total_data['confirmed'] else 'NA'
+                recovered=total_data['recovered'] if total_data['recovered'] else 'NA'
+                deaths=total_data['deceased'] if total_data['deceased'] else 'NA'
                 state=self.getState(key)
                 data_dict={
                     "state":state,
-                    "confirmed":total_data['confirmed'],
-                    "recovered":total_data['recovered'],
-                    "deaths":total_data['deceased'],
-                    "tested":total_data['tested']
+                    "confirmed":confirmed,
+                    "recovered":recovered,
+                    "deaths":deaths,
+                    "tested":tested
                 }
                 data_list.append(data_dict)
 
@@ -46,15 +52,35 @@ class GetIndiaData():
                 covid_data=data_list
             )
             data.save()
-            return "GetAllStatesData Saved Successfully"
+            return "All States Data Saved Successfully"
         except Exception as err:
             logging.exception(err)
             raise Exception(err)
-       
+    
+    def get_district_data(self):
+        try:
+            data=self.all_india_data
+            data_list=[]
+            for key in data:
+                if(key=='TT'):
+                    continue
+                state_name=self.getState(key).strip().lower()
+                districts_data=data[key]['districts']
+                data_list.append({"state":state_name,"districts":json.dumps(districts_data)})
+            logging.info("%s+++++++++ Districts DATA LIST ++++++++++++++++++%s",self.get_district_data.__name__,data_list)
+            data=IndianDistrictData(
+                covid_data=data_list
+            )
+            data.save()
+            return "Districts Data Saved Successfully"
+        except Exception as identifier:
+            logging.exception(identifier)
+            raise Exception(identifier)
+        
     def getState(self,state_code):
         #returns state name using state code
         if(state_code=='AN'):
-            return 'Andaman and Nicobar Islands'
+            return 'Andaman And Nicobar Islands'
 
         if(state_code=='AP'):
             return 'Andhra Pradesh'
@@ -78,7 +104,7 @@ class GetIndiaData():
             return 'Delhi'
 
         if(state_code=='DN'):
-            return 'Dadra and Nagar Haveli'
+            return 'Dadra And Nagar Haveli'
 
         if(state_code=='GA'):
             return 'Goa'
@@ -96,7 +122,7 @@ class GetIndiaData():
             return 'Jharkhand'
 
         if(state_code=='JK'):
-            return 'Jammu and Kashmir'
+            return 'Jammu And Kashmir'
 
         if(state_code=='KA'):
             return 'Karnataka'
